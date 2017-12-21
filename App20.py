@@ -58,6 +58,7 @@ def find_particle_with_shortest_difference():
 
     return min_distance, min_distance_particle
 
+
 with open('Input.txt', 'r') as f:
     initial_state = f.readlines()
 
