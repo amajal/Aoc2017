@@ -8,50 +8,6 @@ def find_mid_point(cluster):
     return mid_x, mid_y
 
 
-def extend_columns(val):
-    number_of_rows = cluster.shape[0]
-    number_of_columns = cluster.shape[1]
-
-    splits = np.hsplit(cluster, number_of_columns)
-    new_array = np.array(list("." * number_of_rows), dtype=np.str).reshape(number_of_rows, 1)
-
-    if val == -1:
-        splits.insert(new_array, 0)
-    else:
-        splits.append(new_array)
-
-    return np.hstack(splits)
-
-
-def extend_rows(val):
-    number_of_rows = cluster.shape[0]
-    number_of_columns = cluster.shape[1]
-
-    splits = np.vsplit(cluster, number_of_rows)
-    new_array = np.array(list("." * number_of_columns)).reshape(number_of_columns, 1)
-
-    if val == -1:
-        splits.insert(new_array, 0)
-    else:
-        splits.append(new_array)
-
-    return np.vstack(splits)
-
-
-def resize_cluster(x, y, cluster):
-    num_of_rows = cluster.shape[0]
-    num_of_columns = cluster.shape[1]
-
-    print("Resize:",  x, y)
-
-    if x in (-1, num_of_columns):
-        return extend_columns(x)
-    elif y in (-1, num_of_rows):
-        return extend_rows(y)
-    else:
-        return cluster
-
-
 def rotate(node, direction):
     rotation = dict()
     rotation["up"] = ("right", "left")
@@ -93,13 +49,16 @@ cluster = np.array(list(puzzle_input), dtype=np.str).reshape(width, height)
 current_x, current_y = find_mid_point(cluster)
 direction = "up"
 
-print(cluster)
 
-for burst in range (1, 6):
+for burst in range (1, 8):
     current_node = cluster[current_x, current_y]
-    print(current_x, current_y, current_node)
+    print_cluster = cluster.copy()
+    print_cluster[current_x, current_y] = "_"
+    print(print_cluster)
+    print(current_x, current_y, direction, current_node)
 
     direction = rotate(current_node, direction)
+
 
     if current_node == '#':
         cluster[current_x, current_y] = 'c'
@@ -108,6 +67,20 @@ for burst in range (1, 6):
 
     current_x, current_y = move_forward(direction, current_x, current_y)
 
-    cluster = resize_cluster(current_x, current_y, cluster)
+    print(current_x, current_y, direction)
 
-    print(cluster)
+    if current_x == -1:
+        cluster = np.insert(cluster, 0, '.', axis=0)
+        current_x = 0
+
+    if current_x == cluster.shape[0]:
+        cluster = np.insert(cluster, cluster.shape[0], '.', axis=0)
+
+    if current_y == -1:
+        cluster = np.insert(cluster, 0, '.', axis=1)
+        current_y = 0
+
+    if current_y == cluster.shape[1]:
+        cluster = np.insert(cluster, cluster.shape[1], '.', axis=1)
+
+
