@@ -2,10 +2,8 @@ import numpy as np
 import math
 
 
-def find_mid_point(cluster):
-    mid_x = int(math.ceil(cluster.shape[0] / 2)) - 1
-    mid_y = int(math.ceil(cluster.shape[1] / 2)) - 1
-    return mid_x, mid_y
+def find_mid_point(length):
+    return int(math.ceil(length / 2)) - 1
 
 
 def rotate(node, direction):
@@ -22,65 +20,72 @@ def rotate(node, direction):
     return rotation[direction][index]
 
 
-def move_forward(direction, x, y):
+def move_forward(direction, row_index, column_index):
     if direction == "right":
-        x += 1
+        column_index += 1
 
     if direction == "left":
-        x -= 1
+        column_index -= 1
 
     if direction == "up":
-        y -= 1
+        row_index -= 1
 
     if direction == "down":
-        y += 1
+        row_index += 1
 
-    return x, y
+    return row_index, column_index
 
 
 with open("Input.txt", "r") as f:
     puzzle_input = f.read()
 
-height = puzzle_input.count("\n") + 1
+rows = puzzle_input.count("\n") + 1
 puzzle_input = puzzle_input.replace("\n", "")
-width = int(len(puzzle_input) / height)
+columns = int(len(puzzle_input) / rows)
 
-cluster = np.array(list(puzzle_input), dtype=np.str).reshape(width, height)
-current_x, current_y = find_mid_point(cluster)
+cluster = np.array(list(puzzle_input), dtype=np.str).reshape(rows, columns)
+
+
+row_index = find_mid_point(cluster.shape[0])
+column_index = find_mid_point(cluster.shape[1])
 direction = "up"
+counter = 0
 
-
-for burst in range (1, 8):
-    current_node = cluster[current_x, current_y]
-    print_cluster = cluster.copy()
-    print_cluster[current_x, current_y] = "_"
-    print(print_cluster)
-    print(current_x, current_y, direction, current_node)
-
+for burst in range(1, 10000+1):
+    current_node = cluster[row_index, column_index]
     direction = rotate(current_node, direction)
 
-
     if current_node == '#':
-        cluster[current_x, current_y] = 'c'
+        cluster[row_index, column_index] = '.'
     elif current_node == '.':
-        cluster[current_x, current_y] = '#'
+        cluster[row_index, column_index] = '#'
+        counter += 1
 
-    current_x, current_y = move_forward(direction, current_x, current_y)
+    row_index, column_index = move_forward(direction, row_index, column_index)
 
-    print(current_x, current_y, direction)
-
-    if current_x == -1:
+    if row_index == -1:
         cluster = np.insert(cluster, 0, '.', axis=0)
-        current_x = 0
+        row_index = 0
 
-    if current_x == cluster.shape[0]:
+    if row_index == cluster.shape[0]:
         cluster = np.insert(cluster, cluster.shape[0], '.', axis=0)
 
-    if current_y == -1:
+    if column_index == -1:
         cluster = np.insert(cluster, 0, '.', axis=1)
-        current_y = 0
+        column_index = 0
 
-    if current_y == cluster.shape[1]:
+    if column_index == cluster.shape[1]:
         cluster = np.insert(cluster, cluster.shape[1], '.', axis=1)
 
+
+    print_cluster = cluster.copy()
+    print_cluster[row_index, column_index] = "_"
+
+    print("Burst: ", burst, row_index, column_index, direction, current_node)
+    #print(cluster)
+    print()
+    #print(print_cluster)
+    print()
+
+print(counter)
 
