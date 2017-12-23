@@ -24,7 +24,6 @@ def execute_program(program):
     registers['a'] = 1
     counter = 0
     run_count = 0
-    mul_counter = 0
 
     while counter < len(instructions):
         tokens = instructions[counter].split()
@@ -41,17 +40,15 @@ def execute_program(program):
             registers[instruction_register] -= op3
         elif cmd in "mul":
             registers[instruction_register] *= op3
-            mul_counter += 1
 
         if cmd in "jnz" and val != 0:
             if op3 < 0:
-                print(registers)
                 counter += op3 - 1
 
         counter += 1
         run_count += 1
 
-        if run_count % 100 == 0:
+        if run_count % 1000000 == 0:
             print(run_count, time.clock() - start_time)
             print(registers)
 
@@ -65,11 +62,11 @@ def parse_program(instructions):
         cmd = tokens[0]
 
         if cmd in 'set':
-            output.append(tokens[1] + "=" + tokens[2])
+            output.append(tokens[1] + " = " + tokens[2])
         elif cmd in "sub":
-            output.append(tokens[1] + "=" + tokens[1] + " - " + tokens[2])
+            output.append(tokens[1] + " = " + tokens[1] + " - " + tokens[2])
         elif cmd in "mul":
-            output.append(tokens[1] + "=" + tokens[1] + " * " + tokens[2])
+            output.append(tokens[1] + " = " + tokens[1] + " * " + tokens[2])
 
         if cmd in "jnz":
             offset = int(tokens[2])
@@ -77,16 +74,16 @@ def parse_program(instructions):
             #if (offset > 0)
             output.append("if " + tokens[1] + " !=  0; jump " + str(offset))
 
-    print(output)
+    print("\n".join(output))
     quit()
 
     return output
 
 
-with open("Input.txt") as f:
+with open("Input2.txt") as f:
     instructions = f.readlines()
 
 program = create_program()
-parse_program(instructions)
-#value = execute_program(program)
-#print(value)
+#parse_program(instructions)
+value = execute_program(program)
+print(value)
